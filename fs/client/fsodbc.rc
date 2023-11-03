@@ -1,0 +1,177 @@
+//Microsoft Developer Studio generated resource script.
+//
+
+//{{NO_DEPENDENCIES}}
+//
+
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        115
+#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_SYMED_VALUE           101
+#endif
+#endif
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <windows.h>
+#include <sql.h>
+#include <sqlext.h>
+#include <verrsrc.h>
+#include "fsodbcx.h"
+#include "release.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+CONFIGDSN DIALOG DISCARDABLE  65, 43, 251, 204
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION FS_SETUP_CAPTION
+FONT 8, "MS Sans Serif"
+BEGIN
+    RTEXT           "Data Source &Name:",-1,17,13,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_DSNAME,85,11,140,12,ES_AUTOHSCROLL | WS_GROUP
+    RTEXT           "Des&cription:",-1,17,32,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_DESCRIPTION,85,30,140,12,ES_AUTOHSCROLL
+    RTEXT           "&Database Name:",-1,17,51,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_DATABASE,85,49,140,12,ES_AUTOHSCROLL
+    RTEXT           "Default &User ID:",-1,17,70,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_UID,85,68,140,12,ES_AUTOHSCROLL
+    RTEXT           "Default P&assword:",-1,17,89,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_PASSWORD,85,87,140,12,ES_AUTOHSCROLL | ES_PASSWORD    
+    RTEXT           "&Server Name:",-1,17,108,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_SERVER,85,106,140,12,ES_AUTOHSCROLL
+    RTEXT           "Server &Port Number:",-1,17,127,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_SERVERPORT,85,125,140,12,ES_AUTOHSCROLL
+    RTEXT           "&Local Port Number:",-1,17,146,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_LOCALPORT,85,144,140,12,ES_AUTOHSCROLL
+    CHECKBOX        "&Encryption:",IDC_ENCRYPTION,46,162,48,12,BS_LEFTTEXT | BS_AUTOCHECKBOX
+    DEFPUSHBUTTON   "OK",IDOK,75,181,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,135,181,40,14
+END
+
+CONFIGFILEDSN DIALOG DISCARDABLE  65, 43, 251, 190
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION FS_SETUP_CAPTION
+FONT 8, "MS Sans Serif"
+BEGIN
+    RTEXT           "File DSN:",-1,17,13,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_DSNAME,85,11,140,12,NOT WS_GROUP
+    RTEXT           "&Database Name:",-1,17,32,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_DATABASE,85,30,140,12,ES_AUTOHSCROLL | WS_GROUP
+    RTEXT           "Default &User ID:",-1,17,51,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_UID,85,49,140,12,ES_AUTOHSCROLL
+    RTEXT           "Default P&assword:",-1,17,70,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_PASSWORD,85,68,140,12,ES_AUTOHSCROLL | ES_PASSWORD
+    RTEXT           "&Server Name:",-1,17,89,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_SERVER,85,87,140,12,ES_AUTOHSCROLL
+    RTEXT           "Server &Port Number:",-1,17,108,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_SERVERPORT,85,106,140,12,ES_AUTOHSCROLL
+    RTEXT           "&Local Port Number:",-1,17,127,65,8,NOT WS_GROUP
+    EDITTEXT        IDC_LOCALPORT,85,125,140,12,ES_AUTOHSCROLL
+    CHECKBOX        "&Encryption:",IDC_ENCRYPTION,46,143,48,12,BS_LEFTTEXT | BS_AUTOCHECKBOX
+    DEFPUSHBUTTON   "OK",IDOK,75,162,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,135,162,40,14
+END
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION FS_MAJOR_VERSION,FS_MINOR_VERSION,FS_SUB_VERSION,0
+ PRODUCTVERSION FS_MAJOR_VERSION,FS_MINOR_VERSION,FS_SUB_VERSION,0
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_DLL
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Portable Software Company\0"
+            VALUE "FileDescription", "Portable Software FS ODBC Driver\0"
+            VALUE "FileVersion", FS_RC_VERSION
+            VALUE "InternalName", "FS101ODBC\0"
+            VALUE "LegalCopyright", COPYRIGHT
+            VALUE "OriginalFilename", "FS101ODBC.DLL\0"
+            VALUE "ProductName", "FS ODBC Driver\0"
+            VALUE "ProductVersion", FS_RC_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+#endif    // !_MAC
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

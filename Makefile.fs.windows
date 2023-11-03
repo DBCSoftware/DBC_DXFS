@@ -1,0 +1,97 @@
+# Makefile for DB/C FS release 101 for Windows
+# For use on GitHub runner
+# modified last on 07 AUG 2023
+
+ProgramFiles:=C:/Program Files (x86)
+WinKit10:=$(ProgramFiles)\Windows Kits\10
+WINSDKVER:=10.0.22621.0
+WINKITBINPATH:=$(WinKit10)\bin\$(WINSDKVER)
+WINKITINCPATH1:="$(WinKit10)\Include\$(WINSDKVER)\um"
+WINKITINCPATH2:="$(WinKit10)\Include\$(WINSDKVER)\shared"
+RSC:="$(WINKITBINPATH)\x64\rc.exe"
+RSC_FLAGS=-nologo -l 0x409 -Fo./$@ -Ifs/include -I$(WINKITINCPATH1) -I$(WINKITINCPATH2)
+CFLAGS32:=-m32 -DWIN32 -DI386 -c
+CFLAGS64:=-Dx64 -D_WIN64 -c
+CFLAGS:=-D_CRT_SECURE_NO_WARNINGS -Wno-pointer-sign -Wno-deprecated-declarations \
+	-Wno-incompatible-function-pointer-types
+CINCLUDES:=-Ifs/include -Icommon/include -Iopenssl/include
+SSL_LIBS32:=openssl/x86/libssl.lib openssl/x86/libcrypto.lib -lCrypt32 -lodbccp32
+SSL_LIBS64:=openssl/x64/libssl.lib openssl/x64/libcrypto.lib -lCrypt32 -lodbccp32
+#
+# NSIS is used to make the Windows ODBC driver installers
+#
+NSIS:="$(ProgramFiles)\NSIS\makensis.exe"
+FSODBCDEF_FILE:=fs/client/fsodbc.def
+FSODBCOBJ32:=fsodbc32.obj fsocfg32.obj fsodesc32.obj fsoerr32.obj \
+	fsoexec32.obj fsomem32.obj mio32.obj \
+	fsosql32.obj fsosrvr32.obj tcp32.obj base32.obj fio32.obj \
+	fioawin32.obj fsodbc.res
+FSODBCOBJ64:=fsodbc64.obj fsocfg64.obj fsodesc64.obj fsoerr64.obj \
+	fsoexec64.obj fsomem64.obj mio64.obj \
+	fsosql64.obj fsosrvr64.obj tcp64.obj base64.obj fio64.obj \
+	fioawin64.obj fsodbc.res
+DBCFSOBJ:=dbcfs.obj base.obj cert.obj fio.obj fioawin.obj mio.obj \
+	rio.obj sio.obj svc.obj tcp.obj util.obj xml.obj
+DBCFSRUNOBJ:=dbcfsrun.obj dbcfscfg.obj fsfile.obj fssql1.obj \
+	fssql2.obj fssql3.obj fssql4.obj fssql5.obj bmath.obj \
+	aio.obj base.obj cert.obj fio.obj fioawin.obj mio.obj rio.obj \
+	sio.obj tcp.obj util.obj xio.obj xml.obj
+DBCFSADMOBJ:=dbcfsadm.obj base.obj fio.obj fioawin.obj mio.obj tcp.obj
+
+
+EXECUTABLES:=dbcfsadm.exe setupodb.exe setupodb64.exe dbcfs.exe dbcfsrun.exe
+
+all: $(EXECUTABLES)
+
+clean:
+	rm -rf *.obj *.res *.exe
+
+dbcfsadm.exe : $(DBCFSADMOBJ)
+	clang $^ -luser32 -lWs2_32 -lgdi32 -lAdvapi32 \
+	$(SSL_LIBS64) -llegacy_stdio_definitions -o $@
+
+dbcfs.exe : $(DBCFSOBJ)
+	clang $^ -luser32 -lWs2_32 -lgdi32 -lnetapi32 -lAdvapi32 -lshlwapi \
+	$(SSL_LIBS64) -llegacy_stdio_definitions -Wl,"/STACK:32000" -o $@
+
+dbcfsrun.exe : $(DBCFSRUNOBJ)
+	clang $^ -luser32 -lWs2_32 -lgdi32 -lAdvapi32 -lshlwapi \
+	$(SSL_LIBS64) -llegacy_stdio_definitions -o $@
+
+setupodb.exe: fsodbc32.dll
+	$(NSIS) fs/Generate32BitODBCSetup.nsi
+
+setupodb64.exe: fsodbc64.dll
+	$(NSIS) fs/Generate64BitODBCSetup.nsi
+
+fsodbc32.dll: $(FSODBCOBJ32) $(FSODBCDEF_FILE)
+	clang -shared -m32 -o fs/$@ $(FSODBCOBJ32) -Wl,"/DEF:$(FSODBCDEF_FILE)" \
+	 $(SSL_LIBS32) -luser32 -lWs2_32 -lgdi32 -lAdvapi32 -llegacy_stdio_definitions
+
+fsodbc64.dll: $(FSODBCOBJ64) $(FSODBCDEF_FILE)
+	clang -shared -o fs/$@ $(FSODBCOBJ64) -Wl,"/DEF:$(FSODBCDEF_FILE)" \
+	 $(SSL_LIBS64) -luser32 -lWs2_32 -lgdi32 -lAdvapi32 -llegacy_stdio_definitions
+
+fsodbc.res : fs/client/fsodbc.rc
+	$(RSC) $(RSC_FLAGS) $<
+
+%32.obj: fs/client/%.c
+	clang $(CFLAGS32) $(CINCLUDES) $(CFLAGS) -o $@ $<
+
+%32.obj: common/support/%.c
+	clang $(CFLAGS32) $(CINCLUDES) \
+	-D_CRT_SECURE_NO_WARNINGS -Wno-deprecated-declarations -o $@ $<
+
+%64.obj: fs/client/%.c
+	clang $(CFLAGS64) $(CINCLUDES) $(CFLAGS) -o $@ $<
+
+%64.obj: common/support/%.c
+	clang $(CFLAGS64) $(CINCLUDES) \
+	-D_CRT_SECURE_NO_WARNINGS -Wno-deprecated-declarations -o $@ $<
+
+%.obj: fs/server/%.c
+	clang $(CFLAGS64) $(CINCLUDES) $(CFLAGS) -o $@ $<
+
+%.obj: common/support/%.c
+	clang $(CFLAGS64) $(CINCLUDES) \
+	-D_CRT_SECURE_NO_WARNINGS -Wno-deprecated-declarations -o $@ $<

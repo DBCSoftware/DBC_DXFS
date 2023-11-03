@@ -1,0 +1,247 @@
+# Makefile for DB/C DX release 101 for Windows
+# For use on GitHub runner
+# modified last on 05 AUG 2023
+
+CPP:=clang
+LINK:=clang
+ProgramFiles:=C:\Program Files (x86)
+WinKit10:=$(ProgramFiles)\Windows Kits\10
+WINSDKVER:=10.0.22621.0
+#WINSDKVER:=10.0.19041.0
+WINKITBINPATH:=$(WinKit10)\bin\$(WINSDKVER)
+WINKITINCPATH1:="$(WinKit10)\Include\$(WINSDKVER)\um"
+WINKITINCPATH2:="$(WinKit10)\Include\$(WINSDKVER)\shared"
+WinKitUmLib:=$(WinKit10)\Lib\$(WINSDKVER)\um\x64
+WINLIBS:=-LIBPATH:"$(WinKitUmLib)"
+
+RSC:="$(WINKITBINPATH)\x64\rc.exe"
+RSC_FLAGS=-nologo -l 0x409 -Fo./$@ -Idx/res -Idx/include -I$(WINKITINCPATH1) -I$(WINKITINCPATH2)
+SSL_LIBS:=openssl/x64/libssl.lib openssl/x64/libcrypto.lib
+CPPFLAGS_DEFINES:=-DWIN32 -Dx64 -D_CRT_SECURE_NO_WARNINGS \
+	-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NON_CONFORMING_SWPRINTFS -DSTRSAFE_NO_DEPRECATE -c \
+	-D_WINSOCK_DEPRECATED_NO_WARNINGS -D_CRT_NONSTDC_NODEPRECATE
+
+CFLAGS:=$(CPPFLAGS_DEFINES) -c -Idx/include -Icommon/include -Iopenssl/include \
+	-Wno-pointer-sign -Wno-unused-value -Wno-logical-not-parentheses \
+	-Wno-parentheses -Wno-incompatible-pointer-types \
+	-Wno-non-literal-null-conversion
+CFLAGS_PNG:=-Wno-tautological-constant-out-of-range-compare
+LINK_LIBS:=-luser32 -lwinspool -lmpr -lwinmm -lWs2_32 -lversion -lnetapi32 -ladvapi32
+LINKW_LIBS:=-lgdi32 -lcomdlg32 -lcomctl32 -lshell32 -lole32 -lMsimg32 -lshlwapi \
+	-luxtheme -lcrypt32
+LINK_DBCSQL_LIBS:=-luuid -lodbc32 -lodbccp32
+LINK_DBCCOM_LIBS:=-luser32 -lcomdlg32 -luuid -lwinmm -lWs2_32
+LINK_DBCCOM_FLAGS:=-shared -v
+LINK_DBCSC_LIBS:=-luser32 -lgdi32 -lshell32 -lole32 -lcomctl32 -lcomdlg32 \
+	 -luxtheme -lshlwapi -lwinspool -lMsimg32 -ladvapi32 -lcrypt32
+PNGLIB:=png.lib
+JPEGLIB:=jpeg.lib
+LIBTOOL:=llvm-ar
+DBCCRES:=dbcc.res
+DBCGRES:=dbc.res
+DBCSCRES:=dbcsc.res
+FNTPDFOBJS:=catalogFontFiles.obj locateFontFile.obj \
+	processFontFiles.obj glyphWidths.obj ttcFontFiles.obj
+
+DBCCOMOBJ:=com.obj comawin.obj base.obj fio.obj fioawin.obj mio.obj
+DBCDOBJ:=dbcd.obj tcp.obj base.obj fio.obj  fioawin.obj xml.obj svc.obj mio.obj
+DBCMPOBJ:=dbcmp.obj dbcmpa.obj dbcmpb.obj dbcmpc.obj dbcmpd.obj dbcmperr.obj \
+	arg.obj base.obj fio.obj fioawin.obj \
+	mio.obj rio.obj xml.obj dbccfg.obj
+DBCSCCOBJ:=dbcsc.obj arg.obj evtwin.obj fio.obj fioawin.obj \
+	fsfileio.obj gui.obj base.obj mio.obj fontcache.obj \
+	tim.obj tcp.obj prt.obj prtawin.obj prtpdf.obj rio.obj \
+	vid.obj vidawin.obj $(FNTPDFOBJS) \
+	xml.obj imgs.obj dbcmd5.obj guiangui.obj guibnul.obj guicnul.obj \
+	afmarrays.obj kdsCfgClrMode.obj
+DBCSCOBJ=dbcsc_g.obj arg.obj evtwin.obj fio.obj fioawin.obj \
+	fsfileio.obj gui_g.obj guiawin.obj guiawin2.obj guiawin3.obj base.obj \
+	mio.obj tim.obj tcp.obj prt_g.obj prtawin.obj prtpdf_g.obj \
+	rio.obj vid.obj vidawin.obj \
+	xml.obj imgs_g.obj dbcmd5.obj guibnul.obj guicnul.obj fontcache.obj \
+	prtawing.obj guiadde.obj afmarrays.obj opendirdlg.obj $(FNTPDFOBJS) \
+	svc.obj kdsCfgClrMode.obj
+DBCSQLOBJ:=dbcsql.obj sqlutil.obj sqlaodbc.obj
+COMMONDBCOBJ:=dbc.obj dbcclnt.obj dbcclnt2.obj dbccom.obj dbccsf.obj \
+	dbcctl.obj dbcctl2.obj dbcdbg.obj dbcdio.obj \
+	dbciex.obj dbckds.obj dbcldr.obj dbcmov.obj dbcmsc.obj dbcmth.obj \
+	dbcprt.obj dbcsrv.obj dbcsys.obj base.obj aio.obj arg.obj evtwin.obj \
+	fio.obj fioawin.obj fsfileio.obj mio.obj \
+	que.obj rio.obj sio.obj svc.obj \
+	tcp.obj tim.obj util.obj vid.obj vidawin.obj xio.obj xml.obj \
+	dbctcx.obj dbcddt.obj dbcmd5.obj dbcgca.obj $(DBCSQLOBJ) dbccfg.obj \
+	fontcache.obj afmarrays.obj cert.obj kdsCfgClrMode.obj \
+	nionull.obj prtawin.obj $(FNTPDFOBJS)
+DBCCOBJ:=$(COMMONDBCOBJ) gui.obj guib.obj guic.obj prt.obj imgs.obj guiangui.obj \
+	prtpdf.obj
+DBCOBJ:=$(COMMONDBCOBJ) gui_g.obj guiawin.obj guiawin2.obj guiawin3.obj \
+	guib_g.obj guic_g.obj prt_g.obj \
+	imgs_g.obj prtawing.obj guiadde.obj opendirdlg.obj prtpdf_g.obj
+JPEGOBJ:=jaricom.obj jcapimin.obj jcomapi.obj jdapimin.obj jdapistd.obj \
+	jdarith.obj jdcoefct.obj jdcolor.obj jddctmgr.obj jdhuff.obj \
+	jdinput.obj jdmainct.obj jdmarker.obj jdmaster.obj jdmerge.obj \
+	jdpostct.obj jdsample.obj jerror.obj jidctfst.obj jidctflt.obj \
+	jidctint.obj jmemmgr.obj jmemnobs.obj jquant1.obj jquant2.obj jutils.obj \
+	jcmarker.obj
+PNGOBJ:=png.obj pngerror.obj pngget.obj pngmem.obj pngread.obj \
+	pngrio.obj pngrtran.obj pngrutil.obj pngset.obj pngtrans.obj \
+	pngwutil.obj pngwio.obj pngwrite.obj pngwtran.obj
+DBCSC_PREREQS=$(DBCSCOBJ) $(DBCSCRES) $(PNGLIB)
+DBC_PREREQS=$(DBCOBJ) $(DBCGRES) $(PNGLIB) $(JPEGLIB)
+
+#
+# The below zlib modules are used to decompress images in png files.
+#
+ZLIBOBJ:=crc32.obj adler32.obj inflate.obj inftrees.obj inffast.obj zutil.obj
+#
+# The below additional zlib modules are used to compress font programs for embedding into pdf files.
+#
+ZLIBOBJ2:=compress.obj deflate.obj trees.obj
+
+EXECUTABLES:=dbc.exe dbcsc.exe dbcc.exe dbcscc.exe dbccom.dll dbcd.exe dbcmp.exe
+
+
+all: $(EXECUTABLES)
+
+clean:
+	rm -rf *.exe *.dll *.obj *.lib *.exp
+
+LINKOUT=-o $@
+
+dbcmp.exe: $(DBCMPOBJ)
+	$(LINK) $(LINKOUT) $^
+
+#
+# Dispatcher for Smart Client
+#
+dbcd.exe: $(DBCDOBJ)
+	$(CPP) $(LINKOUT) $(SSL_LIBS) $(LINK_LIBS) -lcrypt32 $^
+
+dbccom.dll: $(DBCCOMOBJ) dx/runtime/dbccom.def
+	$(CPP) $(LINK_DBCCOM_LIBS) $(LINK_DBCCOM_FLAGS) -v -Wl,"/DEF:dx/runtime/dbccom.def" $(LINKOUT) $(DBCCOMOBJ)
+
+
+DBCDEF:=-Wl,"/DEF:dx/runtime/dbc.def"
+#
+# Gui mode runtime
+#
+dbc.exe: $(DBC_PREREQS)
+	$(LINK) $(LINKOUT) $^ -v \
+	$(LINK_LIBS) $(LINKW_LIBS) $(SSL_LIBS) \
+	-Wl,-subsystem:windows $(LINK_DBCSQL_LIBS) \
+	$(DBCDEF)
+	-rm -f dbc.exp dbc.lib
+
+#
+# Character mode Runtime
+#
+dbcc.exe: $(DBCCRES) $(DBCCOBJ) $(PNGLIB) $(JPEGLIB)
+	$(LINK) $(LINKOUT) $^ \
+	$(LINK_LIBS) \
+	$(LINKW_LIBS) \
+	$(SSL_LIBS) \
+	$(LINK_DBCSQL_LIBS)
+	
+#
+# Character mode Smart Client
+#
+dbcscc.exe: $(DBCSCCOBJ) $(PNGLIB)
+	$(LINK) $(LINKOUT) $(SSL_LIBS) \
+	$(LINK_LIBS) $(LINKW_LIBS) $^
+
+#
+# Gui mode Smart Client
+#
+dbcsc.exe: $(DBCSC_PREREQS)
+	$(LINK) $(LINKOUT) $(SSL_LIBS) $(LINK_DBCSC_LIBS) -Wl,-subsystem:windows $^
+
+$(JPEGLIB) : $(JPEGOBJ)
+	rm -f $@
+	$(LIBTOOL) rc $@ $^
+
+$(PNGLIB) : $(PNGOBJ) $(ZLIBOBJ) $(ZLIBOBJ2)
+	rm -f $@
+	$(LIBTOOL) rc $@ $^
+
+
+#
+# Three 'resource' compiles. For GUI runtime, GUI Smart Client, and Character runtime
+#
+$(DBCCRES) : dx/res/dbcc.rc dx/res/dbccbig.ico dx/res/dbccsmal.ico
+	$(RSC) $(RSC_FLAGS) $<
+
+$(DBCGRES) : dx/res/dbc.rc dx/res/dbcbig.ico dx/res/dbcsmall.ico dx/res/dbc.exe.manifest
+	$(RSC) $(RSC_FLAGS) $< 
+
+$(DBCSCRES) : dx/res/dbcsc.rc dx/res/dbcbig.ico dx/res/dbcsmall.ico dx/res/dbcsc.exe.manifest
+	$(RSC) $(RSC_FLAGS) $<
+
+
+#
+# Common Util objects
+#
+%.obj: common/utils/%.c
+	$(CPP) $(CFLAGS) -o $@ $<
+
+%.obj: common/support/%.c
+	$(CPP) $(CFLAGS) -o $@ $<
+#
+# DX objects
+#
+dbcsc_g.obj: dx/runtime/dbcsc.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+guiadde.obj: dx/runtime/guiadde.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+guib_g.obj: dx/runtime/guib.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS -Idx/jpeg $<
+
+guic_g.obj: dx/runtime/guic.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS -Idx/png $<
+
+gui_g.obj: dx/runtime/gui.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+imgs_g.obj: dx/runtime/imgs.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+guiawin.obj: dx/runtime/guiawin.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+guiawin2.obj: dx/runtime/guiawin2.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+guiawin3.obj: dx/runtime/guiawin3.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+opendirdlg.obj: dx/runtime/opendirdlg.cpp
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS -Wno-writable-strings $<
+
+prtawing.obj: dx/runtime/prtawing.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+prtpdf_g.obj: dx/runtime/prtpdf.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+prt_g.obj: dx/runtime/prt.c
+	$(CPP) $(CFLAGS) -o $@ -D_WINDOWS $<
+
+
+%.obj: dx/compiler/%.c
+	$(CPP) $(CFLAGS) -o $@ $<
+
+%.obj: dx/runtime/%.c
+	$(CPP) $(CFLAGS) -o $@ $<
+
+#
+# JPEG, ZLIB and PNG objects
+#
+%.obj: dx/jpeg/%.c
+	$(CPP) $(CFLAGS) -o $@ $<
+
+%.obj: dx/png/%.c
+	$(CPP) $(CFLAGS) $(CFLAGS_PNG) -o $@ $<
+
+%.obj: dx/zlib/%.c
+	$(CPP) $(CFLAGS) -Wno-deprecated-non-prototype -o $@ $<

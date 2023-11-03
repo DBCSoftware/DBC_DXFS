@@ -1,0 +1,126 @@
+# Makefile for DB/C Common release 101 for Windows
+# modified last on 26 JUL 2023
+
+CPP:=clang
+
+CPPFLAGS_DEFINES:=-DWIN32 -Dx64 -D_CRT_SECURE_NO_WARNINGS \
+	-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NON_CONFORMING_SWPRINTFS -DSTRSAFE_NO_DEPRECATE -c \
+	-D_WINSOCK_DEPRECATED_NO_WARNINGS -D_CRT_NONSTDC_NODEPRECATE
+
+CFLAGS:=$(CPPFLAGS_DEFINES) -c -Iopenssl/include -Icommon/include -Wno-pointer-sign
+
+EXECUTABLES:=aimdex.exe build.exe chain.exe copy.exe create.exe \
+	delete.exe dump.exe edit.exe encode.exe exist.exe filechk.exe index.exe \
+	library.exe list.exe reformat.exe rename.exe sort.exe tdcmp.exe
+
+
+AIMDEXOBJ:=aimdex.obj arg.obj base.obj dbccfg.obj fio.obj fioawin.obj mio.obj evtwin.obj \
+	rio.obj xml.obj
+BUILDOBJ=build.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj rio.obj xml.obj
+CHAINOBJ:=chain.obj chaina.obj chainb.obj arg.obj base.obj dbccfg.obj \
+	xml.obj fio.obj fioawin.obj rio.obj mio.obj evtwin.obj \
+	tim.obj
+COPYOBJ=copy.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj xml.obj
+CREATEOBJ=create.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj rio.obj xml.obj
+DELETEOBJ:=delete.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj xml.obj
+DUMPOBJ:=dump.obj arg.obj base.obj dbccfg.obj xml.obj \
+	fio.obj fioawin.obj vid.obj vidawin.obj mio.obj tim.obj evtwin.obj \
+	kdsCfgClrMode.obj
+EDITOBJ:=edit.obj arg.obj base.obj dbccfg.obj xml.obj \
+	fio.obj fioawin.obj vid.obj vidawin.obj evtwin.obj mio.obj \
+	rio.obj tim.obj kdsCfgClrMode.obj
+ENCODEOBJ:=encode.obj arg.obj base.obj fio.obj fioawin.obj \
+	mio.obj rio.obj dbccfg.obj xml.obj
+EXISTOBJ:=exist.obj arg.obj base.obj dbccfg.obj xml.obj \
+	fio.obj fioawin.obj mio.obj
+FILECHKOBJ:=filechk.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj xml.obj
+INDEXOBJ:=index.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj rio.obj sio.obj xml.obj
+LIBRARYOBJ=library.obj vid.obj vidawin.obj arg.obj base.obj dbccfg.obj \
+	xml.obj fio.obj fioawin.obj mio.obj evtwin.obj tim.obj \
+	kdsCfgClrMode.obj
+LISTOBJ=list.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj rio.obj aio.obj xio.obj xml.obj
+REFORMATOBJ=reformat.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj rio.obj xml.obj
+RENAMEOBJ=rename.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj xml.obj
+SORTOBJ=sort.obj arg.obj base.obj dbccfg.obj fio.obj \
+	fioawin.obj mio.obj rio.obj sio.obj xml.obj
+TDCMPOBJ=tdcmp.obj arg.obj base.obj dbccfg.obj xml.obj \
+	fio.obj fioawin.obj rio.obj mio.obj
+
+
+
+all: $(EXECUTABLES)
+
+LINKOUT=-o $@
+
+aimdex.exe: $(AIMDEXOBJ)
+	$(CPP) $(LINKOUT) $^
+
+build.exe: $(BUILDOBJ)
+	$(CPP) $(LINKOUT) $^
+
+chain.exe: $(CHAINOBJ)
+	$(CPP) $(LINKOUT) $^
+
+copy.exe: $(COPYOBJ)
+	$(CPP) $(LINKOUT) $^
+
+create.exe: $(CREATEOBJ)
+	$(CPP) $(LINKOUT) $^
+
+delete.exe: $(DELETEOBJ)
+	$(CPP) $(LINKOUT) $^
+
+dump.exe: $(DUMPOBJ)
+	$(CPP) $(LINKOUT) -luser32 $^
+
+edit.exe: $(EDITOBJ)
+	$(CPP) $(LINKOUT) -luser32 $^
+
+encode.exe: $(ENCODEOBJ)
+	$(CPP) $(LINKOUT) $^
+
+exist.exe: $(EXISTOBJ)
+	$(CPP) $(LINKOUT) $^
+
+filechk.exe: $(FILECHKOBJ)
+	$(CPP) $(LINKOUT) $^
+
+index.exe: $(INDEXOBJ)
+	$(CPP) $(LINKOUT) $^
+
+library.exe: $(LIBRARYOBJ)
+	$(CPP) $(LINKOUT) -luser32 $^
+
+list.exe: $(LISTOBJ)
+	$(CPP)  $(LINKOUT) $^
+
+reformat.exe: $(REFORMATOBJ)
+	$(CPP)  $(LINKOUT) $^
+
+rename.exe: $(RENAMEOBJ)
+	$(CPP)  $(LINKOUT) $^
+
+sort.exe: $(SORTOBJ)
+	$(CPP)  $(LINKOUT) $^
+
+tdcmp.exe : $(TDCMPOBJ)
+	$(CPP) $(LINKOUT) $^
+
+
+#
+# Common Util objects
+#
+%.obj: common/utils/%.c
+	$(CPP) $(CFLAGS) -o $@ $<
+
+%.obj: common/support/%.c
+	$(CPP) $(CFLAGS) -o $@ $<

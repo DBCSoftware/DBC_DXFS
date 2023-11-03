@@ -1,0 +1,129 @@
+# Makefile for DB/C Common release 101 for Ubuntu
+# modified last on 27 JUL 2023
+
+CC:=gcc
+EXECUTABLES:=aimdex build chain copy create \
+	delete dump edit encode exist filechk index \
+	library list reformat rename sort tdcmp
+
+INC:=common/include
+CFLAGS:=-O -c -D_FILE_OFFSET_BITS=64 -DLinux -DUSE_POSIX_TERMINAL_IO -Wall -Wextra \
+ -Wno-unused-value -Wno-uninitialized -Wno-parentheses -Wno-missing-braces -Wno-unused-parameter \
+ -DOPENSSL_NO_KRB5 -std=gnu99 -I$(INC) -I/usr/include \
+ -Wno-unused-result -Wno-implicit-fallthrough -Wno-unused-function -Wno-shift-negative-value \
+ -Wno-char-subscripts -Wno-unused-variable -Wno-unknown-pragmas
+
+AIMDEXOBJ:=aimdex.o arg.o base.o dbccfg.o fio.o fioaunx.o mio.o evtunx.o rio.o \
+	xml.o
+BUILDOBJ:=build.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o rio.o xml.o
+CHAINOBJ:=chain.o chaina.o chainb.o arg.o base.o dbccfg.o \
+	xml.o fio.o fioaunx.o rio.o mio.o evtunx.o \
+	tim.o
+COPYOBJ:=copy.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o xml.o
+CREATEOBJ:=create.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o rio.o xml.o
+DELETEOBJ:=delete.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o xml.o
+DUMPOBJ:=dump.o arg.o base.o dbccfg.o xml.o \
+	fio.o fioaunx.o vid.o vidaunx.o mio.o tim.o evtunx.o \
+	kdsCfgClrMode.o
+EDITOBJ:=edit.o arg.o base.o dbccfg.o xml.o \
+	fio.o fioaunx.o vid.o vidaunx.o evtunx.o mio.o \
+	rio.o tim.o kdsCfgClrMode.o
+ENCODEOBJ:=encode.o arg.o base.o fio.o fioaunx.o \
+	mio.o rio.o dbccfg.o xml.o
+EXISTOBJ:=exist.o arg.o base.o dbccfg.o xml.o \
+	fio.o fioaunx.o mio.o
+FILECHKOBJ:=filechk.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o xml.o
+INDEXOBJ:=index.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o rio.o sio.o xml.o
+LIBRARYOBJ:=library.o vid.o vidaunx.o arg.o base.o dbccfg.o \
+	xml.o fio.o fioaunx.o mio.o evtunx.o tim.o \
+	kdsCfgClrMode.o
+LISTOBJ:=list.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o rio.o aio.o xio.o xml.o
+REFORMATOBJ:=reformat.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o rio.o xml.o
+RENAMEOBJ:=rename.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o xml.o
+SORTOBJ:=sort.o arg.o base.o dbccfg.o fio.o \
+	fioaunx.o mio.o rio.o sio.o xml.o
+TDCMPOBJ:=tdcmp.o arg.o base.o dbccfg.o xml.o \
+	fio.o fioaunx.o rio.o mio.o
+
+
+#
+#Might be needed?
+#
+#LDFLAGS:=-lpthread
+LINKOUT=-o $@
+LCURSES:=-lncurses -ltinfo
+
+all: $(EXECUTABLES)
+
+aimdex: $(AIMDEXOBJ)
+	$(CC) $(LINKOUT) $^
+
+build: $(BUILDOBJ)
+	$(CC) $(LINKOUT) $^
+
+chain: $(CHAINOBJ)
+	$(CC) $(LINKOUT) $^
+
+copy: $(COPYOBJ)
+	$(CC) $(LINKOUT) $^
+
+create: $(CREATEOBJ)
+	$(CC) $(LINKOUT) $^
+
+delete: $(DELETEOBJ)
+	$(CC) $(LINKOUT) $^
+
+dump: $(DUMPOBJ)
+	$(CC) $(LINKOUT) $^ $(LCURSES)
+
+edit: $(EDITOBJ)
+	$(CC) $(LINKOUT) $^ $(LCURSES)
+
+encode: $(ENCODEOBJ)
+	$(CC) $(LINKOUT) $^
+
+exist: $(EXISTOBJ)
+	$(CC) $(LINKOUT) $^
+
+filechk: $(FILECHKOBJ)
+	$(CC) $(LINKOUT) $^
+
+index: $(INDEXOBJ)
+	$(CC) $(LINKOUT) $^
+
+library: $(LIBRARYOBJ)
+	$(CC) $(LINKOUT) $^ $(LCURSES)
+
+list: $(LISTOBJ)
+	$(CC) $(LINKOUT) $^
+
+reformat: $(REFORMATOBJ)
+	$(CC) $(LINKOUT) $^
+
+rename: $(RENAMEOBJ)
+	$(CC) $(LINKOUT) $^
+
+sort: $(SORTOBJ)
+	$(CC) $(LINKOUT) $^
+
+tdcmp: $(TDCMPOBJ)
+	$(CC) $(LINKOUT) $^
+
+
+#
+# Common Util objects
+#
+%.o: common/utils/%.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+%.o: common/support/%.c
+	$(CC) $(CFLAGS) -o $@ $<

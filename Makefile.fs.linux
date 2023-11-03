@@ -1,0 +1,75 @@
+# Makefile for DB/C FS release 101 for Ubuntu
+# For use on GitHub runner
+# modified last on 05 AUG 2023
+
+CC:=gcc
+
+INCLUDES:=-Ifs/include -Icommon/include -Iopenssl/include
+CFLAGS:=-O -c -D_FILE_OFFSET_BITS=64 -DLinux -DUSE_POSIX_TERMINAL_IO -Wall -Wextra \
+ -Wno-unused-value -Wno-uninitialized -Wno-parentheses -Wno-missing-braces -Wno-unused-parameter \
+ -DOPENSSL_NO_KRB5 -std=gnu99 $(INCLUDES) -I/usr/include \
+ -Wno-unused-result -Wno-implicit-fallthrough -Wno-unused-function -Wno-shift-negative-value \
+ -Wno-char-subscripts -Wno-unused-variable -Wno-unknown-pragmas -Wno-unused-but-set-variable \
+ -fno-aggressive-loop-optimizations -Wno-tautological-compare
+LDFLAGS:=-lpthread
+LDFLAGSXTRA:=-lz
+LDL:=-ldl
+
+#
+# The following works on Ubuntu 20.04
+# May need editing on your system
+# Note that using this form results in a static, not shared, library link.
+#
+SSLLIB:=openssl/libssl.a openssl/libcrypto.a
+
+DBCFSOBJ:=dbcfs.o tcp.o base.o xml.o util.o \
+	fio.o fioaunx.o rio.o xio.o aio.o mio.o sio.o cert.o
+DBCFSADMOBJ:=dbcfsadm.o tcp.o base.o fio.o fioaunx.o mio.o
+DBCFSRUNOBJ:=dbcfsrun.o aio.o base.o bmath.o cert.o\
+	dbcfscfg.o fsfile.o fssql1.o fssql2.o fssql3.o fssql4.o fssql5.o \
+	fio.o fioaunx.o mio.o rio.o sio.o tcp.o util.o xio.o xml.o
+SETUPODBOBJ:=setupodb.o
+ODBCOBJ:=fsodbc.o fsodesc.o fsoerr.o fsomem.o \
+	fsosql.o fsosrvr.o fsoexec.o tcp.o base.o
+ODBCSETUPOBJ:=fsosetunx.o
+
+EXECUTABLES:=dbcfs dbcfsadm dbcfsrun setupodb fsodbc.a fsodbcu.a
+
+all: $(EXECUTABLES)
+
+clean:
+	rm -f $(EXECUTABLES) *.o fso*.a
+
+dbcfs: $(DBCFSOBJ)
+	$(CC) -o $@ $^ $(SSLLIB) $(LDFLAGS) $(LDFLAGSXTRA) $(LDL)
+
+dbcfsadm: $(DBCFSADMOBJ)
+	$(CC) -o $@ $^ $(SSLLIB) $(LDFLAGS) $(LDFLAGSXTRA) $(LDL)
+
+dbcfsrun: $(DBCFSRUNOBJ)
+	$(CC) -o $@ $^ $(SSLLIB) $(LDFLAGS) $(LDFLAGSXTRA) $(LDL)
+
+setupodb: $(SETUPODBOBJ)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDL) 
+
+fsodbcu.a: $(ODBCSETUPOBJ)
+	rm -rf fsodbcu.a
+	ld -G -o fsodbcu.a $^ -lodbc
+	chmod a+x fsodbcu.a
+
+fsodbc.a: $(ODBCOBJ)
+	rm -rf fsodbc.a
+	ld -G -o fsodbc.a $(ODBCOBJ) $(SSLLIB) -lodbc -lodbcinst
+	chmod a+x fsodbc.a
+
+#
+# DX objects
+#
+%.o: fs/client/%.c
+	$(CC) $(CFLAGS) -fPIC -o $@ $<
+
+%.o: fs/server/%.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+%.o: common/support/%.c
+	$(CC) $(CFLAGS) -fPIC -o $@ $<
