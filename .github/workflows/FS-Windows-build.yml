@@ -1,0 +1,35 @@
+name: Run FS Make on Windows
+on:
+   workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Make FS Server binaries
+      run: |
+        make -f Makefile.fs.windows dbcfsadm.exe dbcfs.exe dbcfsrun.exe
+    - name: Artifact One
+      uses: actions/upload-artifact@v3
+      with:
+        name: FSServerForWindows
+        path: |
+          dbcfsadm.exe
+          dbcfs.exe
+          dbcfsrun.exe
+    - name: Install NSIS
+      run: choco install nsis
+    - name: Make ODBC Drivers
+      run: |
+        make -f Makefile.fs.windows setupodb.exe setupodb64.exe
+        mv fs/setupodb.exe .
+        mv fs/setupodb64.exe .
+    - name: Artifact Two
+      uses: actions/upload-artifact@v3
+      with:
+        name: FSClientForWindows
+        path: |
+          setupodb.exe
+          setupodb64.exe

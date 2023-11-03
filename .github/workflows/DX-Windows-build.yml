@@ -1,0 +1,25 @@
+name: Run DX Make on Windows
+on:
+   workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Make
+      run: |
+        make -f Makefile.dx.windows all
+    - name: Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: DxForWindows
+        path: |
+          dbcscc.exe
+          dbcmp.exe
+          dbcd.exe
+          dbccom.dll
+          dbcc.exe
+          dbcsc.exe
+          dbc.exe

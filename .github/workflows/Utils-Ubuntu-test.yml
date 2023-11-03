@@ -1,0 +1,46 @@
+name: Run common utilities basic sanity tests
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+on:
+  workflow_dispatch
+
+jobs:
+  DoIt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Restore common utilities
+        uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: |
+            aimdex
+            build
+            chain
+            copy
+            create
+            delete
+            dump
+            edit
+            encode
+            exist
+            filechk
+            index
+            library
+            list
+            reformat
+            rename
+            sort
+            tdcmp
+          key: ${{ runner.os }}-common
+      - name: echo an XML file
+        run: ./TestUtilities.sh
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: ju.xml
