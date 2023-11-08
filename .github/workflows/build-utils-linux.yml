@@ -13,7 +13,7 @@ jobs:
     - name: Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: utilitiesForLinux
+        name: utilslinux
         path: |
           aimdex
           build
@@ -33,26 +33,3 @@ jobs:
           rename
           sort
           tdcmp
-    - uses: actions/cache/save@v3
-      id: cache
-      with:
-        path: |
-          aimdex
-          build
-          chain
-          copy
-          create
-          delete
-          dump
-          edit
-          encode
-          exist
-          filechk
-          index
-          library
-          list
-          reformat
-          rename
-          sort
-          tdcmp
-        key: ${{ runner.os }}-common
