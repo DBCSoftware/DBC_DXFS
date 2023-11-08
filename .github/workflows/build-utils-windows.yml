@@ -13,5 +13,5 @@ jobs:
     - name: Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: utilitiesForWindows
+        name: utilswindows
         path: ./*.exe
