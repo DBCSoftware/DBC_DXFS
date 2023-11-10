@@ -677,7 +677,7 @@ SQLRETURN SQL_API SQLColAttribute(
 	SQLPOINTER CharacterAttributePtr,
 	SQLSMALLINT BufferLength,
 	SQLSMALLINT *StringLengthPtr,
-#ifdef _WIN64
+#if defined(_WIN64) || defined(Linux)
 	SQLLEN *NumericAttributePtr)
 #else
 	SQLPOINTER NumericAttributePtr)
