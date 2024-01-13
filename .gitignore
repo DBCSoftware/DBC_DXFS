@@ -10,6 +10,7 @@
 *.dll
 *.res
 *.exp
+*.class
 mycert*.txt
 !libssl.a
 !libcrypto.a
