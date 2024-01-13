@@ -1,0 +1,21 @@
+name: Build and jar FS-JDBC
+on:
+   workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Build
+          run: |
+            cd jdbc
+            %JAVA_HOME_17_X64%/bin/javac org/ptsw/fs/jdbc/*.java
+            %JAVA_HOME_17_X64%/bin/jar cf fsjdbc.jar org/ptsw/fs/jdbc/*.class .\org\ptsw\fs\jdbc\Messages.properties
+        - name: Artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: FSJDBC
+            path: |
+              fsjdbc.jar
