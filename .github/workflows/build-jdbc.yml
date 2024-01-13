@@ -11,7 +11,7 @@ jobs:
         - name: Build
           run: |
             $JAVA_HOME_17_X64/bin/javac jdbc/org/ptsw/fs/jdbc/*.java
-            $JAVA_HOME_17_X64/bin/jar cf fsjdbc.jar jdbc/org/ptsw/fs/jdbc/*.class jdbc/org/ptsw/fs/jdbc/Messages.properties
+            $JAVA_HOME_17_X64/bin/jar cf fsjdbc.jar -C jdbc org/ptsw/fs/jdbc/*.class org/ptsw/fs/jdbc/Messages.properties
         - name: Artifact
           uses: actions/upload-artifact@v3
           with:
