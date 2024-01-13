@@ -9,12 +9,13 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v3
         - name: Build
+          working-directory: ./jdbc
           run: |
-            $JAVA_HOME_17_X64/bin/javac jdbc/org/ptsw/fs/jdbc/*.java
-            $JAVA_HOME_17_X64/bin/jar cf fsjdbc.jar -C jdbc org/ptsw/fs/jdbc/*.class org/ptsw/fs/jdbc/Messages.properties
+            $JAVA_HOME_17_X64/bin/javac org/ptsw/fs/jdbc/*.java
+            $JAVA_HOME_17_X64/bin/jar cf fsjdbc.jar org/ptsw/fs/jdbc/*.class org/ptsw/fs/jdbc/Messages.properties
         - name: Artifact
           uses: actions/upload-artifact@v3
           with:
             name: FSJDBC
             path: |
-              fsjdbc.jar
+              jdbc/fsjdbc.jar
