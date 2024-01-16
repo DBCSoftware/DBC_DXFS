@@ -11,7 +11,7 @@ jobs:
         - name: Compile
           working-directory: ./SmartClient_Java/src
           run: |
-            $JAVA_HOME_17_X64/bin/javac -cp ../lib/* -d ../bin @srcfiles.list
+            $JAVA_HOME_17_X64/bin/javac -cp '../lib/*' -d ../bin @srcfiles.list
         - name: Jar
           working-directory: ./SmartClient_Java/bin
           run : |
