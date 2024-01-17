@@ -71,7 +71,7 @@ EXECUTABLES:= dbcsql.so dbc dbcd dbcmp dbcsc
 all: $(EXECUTABLES)
 
 clean:
-	rm -f $(EXECUTABLES) *.o lib*.a
+	rm -f $(EXECUTABLES) *.o libdbc.a libjpeg.a libpng.a
 
 dbc: libdbc.a libjpeg.a libpng.a
 	$(CC) -o $@ $^ $(LDFLAGS) $(CUPSLIB) -lm $(SSLLIB) -ldl $(LCURSES)
