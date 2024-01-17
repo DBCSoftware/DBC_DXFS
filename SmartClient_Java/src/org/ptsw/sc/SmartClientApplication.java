@@ -397,17 +397,28 @@ public class SmartClientApplication extends Application {
 		String temp = ((String)obj1).substring(expectedServerGreeting.length());
 		int i1 = temp.indexOf('.');
 		if (i1 < 1) {
-			System.err.println("ERROR: Server returned incorrect XML(C)");
-			return false;
+			// If no decimal point found, test for open source version, might be simply 101.
+			// i.e. 'DB/C SS 101'
+			try { ServerMajorVersion = Integer.parseInt(temp.substring(0)); }
+			catch (NumberFormatException nfe) {
+				System.err.println("ERROR: Server Major version not found");
+				return false;
+			}
+			if (ServerMajorVersion > MAJORVERSION && ServerMajorVersion < 101) {
+				System.err.println("ERROR: Server Major version out of range");
+				return false;
+			}
 		}
-		ServerMajorVersion = Integer.parseInt(temp.substring(0,  i1));
-		if (ServerMajorVersion > MAJORVERSION) {
-			System.err.println("ERROR: Server version is too high for me");
-			return false;
-		}
-		if (ServerMajorVersion < 14) {
-			System.err.println("ERROR: Server version is too old for me");
-			return false;
+		else {
+			ServerMajorVersion = Integer.parseInt(temp.substring(0,  i1));
+			if (ServerMajorVersion > MAJORVERSION) {
+				System.err.println("ERROR: Server version is too high for me");
+				return false;
+			}
+			if (ServerMajorVersion < 14) {
+				System.err.println("ERROR: Server version is too old for me");
+				return false;
+			}
 		}
 		if (trace) {
 			System.out.println("Leaving AttemptFirstContact");
