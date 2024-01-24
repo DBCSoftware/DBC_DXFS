@@ -19,6 +19,7 @@ package org.ptsw.sc;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
@@ -103,11 +104,19 @@ public class SmartClientApplication extends Application {
 	public void init() throws Exception {
 		int i1;
 		super.init();
-		if (bigIconFile.exists()) {
-			bigIcon = new Image(bigIconFile.toURI().toURL().toString(), false);
+		InputStream is1 = ClassLoader.getSystemResourceAsStream(bigIconPath);
+		InputStream is2 = ClassLoader.getSystemResourceAsStream(littleIconPath);
+		if (is1 == null || is2 == null) {
+			if (bigIconFile.exists()) {
+				bigIcon = new Image(bigIconFile.toURI().toURL().toString(), false);
+			}
+			if (littleIconFile.exists()) {
+				littleIcon = new Image(littleIconFile.toURI().toURL().toString(), false);
+			}
 		}
-		if (littleIconFile.exists()) {
-			littleIcon = new Image(littleIconFile.toURI().toURL().toString(), false);
+		else {
+			bigIcon = new Image(is1);
+			littleIcon = new Image(is2);
 		}
 		Platform.setImplicitExit(false);
 		appParms = getParameters();
