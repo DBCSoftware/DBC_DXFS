@@ -12,10 +12,14 @@ jobs:
           working-directory: ./SmartClient_Java/src
           run: |
             $JAVA_HOME_17_X64/bin/javac -cp '../lib/*' -d ../bin @srcfiles.list
-        - name: Jar
+        - name: Jar the class files
           working-directory: ./SmartClient_Java/bin
           run : |
             $JAVA_HOME_17_X64/bin/jar cmf ./Manifest.mf dbcsc.jar ./*
+        - name: Jar the icons
+          working-directory: ./SmartClient_Java
+          run : |
+            $JAVA_HOME_17_X64/bin/jar uf bin/dbcsc.jar ./Images/*
         - name: Artifact
           uses: actions/upload-artifact@v3
           with:
