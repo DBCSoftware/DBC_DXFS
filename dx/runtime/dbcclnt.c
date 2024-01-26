@@ -224,13 +224,13 @@ int clientstart(char *client, int clientport, int encryptflag, int serverport, i
 	tcpflags = TCP_UTF8;
 	if (encryptflag) {
 		tcpflags |= TCP_SSL;
+		certFileBio = GetCertBio(certificatefilename);
+		if (certFileBio == NULL) {
+			strcpy(clienterror, GetCertBioErrorMsg());
+			return RC_ERROR;
+		}
 	}
 
-	certFileBio = GetCertBio(certificatefilename);
-	if (certFileBio == NULL) {
-		strcpy(clienterror, GetCertBioErrorMsg());
-		return RC_ERROR;
-	}
 	sendbuffer = (CHAR *) malloc(SEND_INITSIZE + 2);
 	recvbuffer = (CHAR *) malloc(RECV_INITSIZE + 2);
 	elembuffer = (CHAR *) malloc(ELEM_INITSIZE);
