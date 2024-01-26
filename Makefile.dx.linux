@@ -117,6 +117,9 @@ sqlaodbc.o: dx/runtime/sqlaodbc.c
 #
 # DX objects
 #
+dbcmsc.o: dx/runtime/dbcmsc.c
+	$(CC) $(CFLAGS) -DDBC_SQL=1 -o $@ $<
+
 %.o: dx/compiler/%.c
 	$(CC) $(CFLAGS) -o $@ $<
 
