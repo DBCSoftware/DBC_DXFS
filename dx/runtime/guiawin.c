@@ -1353,14 +1353,9 @@ static LRESULT handleCtlColorStatic(WPARAM wParam, LPARAM lParam) {
 		return (LRESULT)NULL;
 	}
 
-	if (ISTEXT(control) || control->type == PANEL_BOXTITLE || ISRADIO(control)) {
+	if (ISTEXT(control) || control->type == PANEL_BOX || control->type == PANEL_BOXTITLE || ISRADIO(control)) {
 		SetBkColor((HDC) wParam,  GetSysColor(COLOR_BTNFACE));
-		guiaSetControlTextColor((HDC) wParam, control, RGB(0, 0, 0));
-		return (LRESULT) hbrButtonFace;
-	}
-
-	if (control->type == PANEL_BOX) {
-		SetBkColor((HDC) wParam,  GetSysColor(COLOR_BTNFACE));
+		if (control->type != PANEL_BOX) guiaSetControlTextColor((HDC) wParam, control, RGB(0, 0, 0));
 		return (LRESULT) hbrButtonFace;
 	}
 	return 0;
@@ -3596,9 +3591,26 @@ LRESULT CALLBACK guiaControlProc(HWND hwnd, UINT nMessage, WPARAM wParam, LPARAM
 	case WM_ERASEBKGND:
 		if ((control->type == PANEL_BOXTITLE || control->type == PANEL_BOX)
 				&& control->tabgroup != 0 /* Only if in a tab */) {
-			RECT rc;
+			RECT rc, boxRect, testRect;
 			GetClientRect(hwnd, &rc);
 			FillRect((HDC) wParam, &rc, hbrButtonFace);
+			// March 1, 2024 jpr
+			// Cause painting of all controls that are both on this tab and in this box.
+			// Fixes an ugly visual glitch of bleed through inside the box of any background.
+			//
+			RESOURCE* res = *control->res;
+			CONTROL* ctrls = (CONTROL *) res->content;
+			boxRect = rc;
+			for (int i2 = 0; i2 < res->entrycount; i2++) {
+				CONTROL* otherControl = &ctrls[i2];
+				if (otherControl == control) continue;
+				if (control->tabgroup != otherControl->tabgroup) continue;
+				if (control->tabsubgroup != otherControl->tabsubgroup) continue;
+				GetClientRect(otherControl->ctlhandle, &rc);
+				if (IntersectRect(&testRect, &boxRect, &rc))
+					InvalidateRect(otherControl->ctlhandle, &rc, FALSE);
+			}
+			return 1;
 		}
 		break;
 	case WM_LBUTTONDBLCLK:
